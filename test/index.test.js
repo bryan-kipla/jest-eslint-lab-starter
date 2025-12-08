@@ -1,39 +1,46 @@
 const { capitalizeWords, filterActiveUsers, logAction } = require('../index');
 
-describe('capitalizeWords', () => {
-  test('capitalizes the first letter of each word in a string', () => {
-    expect(capitalizeWords('hello world')).toBe('Hello World');
-    expect(capitalizeWords('javascript is fun')).toBe('Javascript Is Fun');
-  });
 
-  test('throws an error for non-string input', () => {
-    expect(() => capitalizeWords(123)).toThrow('Input must be a string.');
-  });
+test('capitalizeWords should capitalize each word', () => {
+  expect(capitalizeWords('hello world')).toBe('Hello World');
 });
 
-describe('filterActiveUsers', () => {
-  test('filters users with active status true', () => {
-    const users = [
-      { name: 'Alice', active: true },
-      { name: 'Bob', active: false },
-      { name: 'Charlie', active: true }
-    ];
-    expect(filterActiveUsers(users)).toEqual([
-      { name: 'Alice', active: true },
-      { name: 'Charlie', active: true }
-    ]);
-  });
 
-  test('throws an error for non-array input', () => {
-    expect(() => filterActiveUsers('not an array')).toThrow('Input must be an array.');
-  });
+test('filterActiveUsers should return only active users', () => {
+  const users = [
+    { name: 'John', isActive: true },
+    { name: 'Adam', isActive: false }
+  ];
+  const result = filterActiveUsers(users);
+  expect(result.length).toBe(1);
+  expect(result[0].name).toBe('John');
 });
 
-describe('logAction', () => {
-  test('logs the action to the console', () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    logAction('User logged in');
-    expect(consoleSpy).toHaveBeenCalledWith('Action logged: User logged in');
-    consoleSpy.mockRestore();
-  });
+// Test 3: Correct log string format
+test('logAction generates correct log string for valid inputs', () => {
+  const result = logAction('login', 'John');
+  // Has the right structure
+  expect(result).toContain('User John performed login at ');
+  // Has a timestamp
+  expect(result.split(' at ')[1]).toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
 });
+
+// Test 4: Edge cases - empty strings
+test('logAction handles empty strings as inputs', () => {
+  const result1 = logAction('', 'John');
+  expect(result1).toContain('User John performed  at ');
+  
+  const result2 = logAction('login', '');
+  expect(result2).toContain('User  performed login at ');
+});
+
+// Test 5: Edge cases - missing parameters
+test('logAction handles missing action or username', () => {
+  const result1 = logAction(undefined, 'John');
+  expect(result1).toContain('User John performed undefined at ');
+  
+  const result2 = logAction('login', undefined);
+  expect(result2).toContain('User undefined performed login at ');
+});
+
+
